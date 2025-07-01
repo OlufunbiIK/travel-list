@@ -1,14 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import Item from "./Item";
 
 export default function PackingList({
   items = [],
   onDeleteItem,
   onToggleItem,
+  onClearList,
 }) {
   const packedCount = items.filter((item) => item.packed).length;
   const totalCount = items.length;
   const packingProgress = totalCount > 0 ? (packedCount / totalCount) * 100 : 0;
+  const [sortBy, setSortBy] = useState("input");
+
+  let sortedItems;
+  if (sortBy === "input") {
+    sortedItems = items;
+  }
+
+  if (sortBy === "description") {
+    sortedItems = items
+      .slice()
+      .sort((a, b) => a.description.localeCompare(b.description));
+  }
+
+  if (sortBy === "packed") {
+    sortedItems = items
+      .slice()
+      .sort((a, b) => Number(a.packed) - Number(b.packed));
+  }
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
@@ -96,7 +115,7 @@ export default function PackingList({
           <div className="flex-1 w-full max-w-6xl">
             <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/10">
               <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {items.map((item, index) => (
+                {sortedItems.map((item, index) => (
                   <li
                     key={item.id}
                     className="transform transition-all duration-500 hover:scale-105"
@@ -122,8 +141,72 @@ export default function PackingList({
             </div>
           </div>
         )}
-        <div className=""></div>
+        {/* Actions section */}
+        {items.length > 0 && (
+          <div className="mt-8 mb-8 w-full max-w-4xl">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              {/* Sort dropdown */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/20">
+                <div className="flex items-center gap-4">
+                  <span className="text-white/90 font-semibold text-lg flex items-center gap-2">
+                    <span className="text-xl">🔄</span>
+                    Sort by:
+                  </span>
+                  <div className="relative">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl px-4 py-3 text-white font-medium appearance-none cursor-pointer hover:bg-white/25 focus:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300 min-w-48"
+                    >
+                      <option value="input" className="bg-gray-800 text-white">
+                        Sort by Order
+                      </option>
+                      <option
+                        value="description"
+                        className="bg-gray-800 text-white"
+                      >
+                        Sort by Description
+                      </option>
+                      <option value="packed" className="bg-gray-800 text-white">
+                        Sort by Packed Status
+                      </option>
+                    </select>
+                    {/* Custom dropdown arrow */}
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-white/70"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
+              {/* Clear list button */}
+              <button
+                onClick={onClearList}
+                className="group relative bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm border border-red-400/30 hover:border-red-400/50 rounded-xl px-6 py-3 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-red-400/50 active:scale-95"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-lg group-hover:animate-pulse">🗑️</span>
+                  Clear List
+                </span>
+
+                {/* Subtle animated background effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-red-400/10 via-transparent to-red-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </button>
+            </div>
+          </div>
+        )}
         {/* Achievement badges for completion */}
         {packingProgress === 100 && totalCount > 0 && (
           <div className="fixed top-20 right-8 z-50 animate-bounce">

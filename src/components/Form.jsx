@@ -48,7 +48,7 @@ export default function Form({ items = [], setItems = () => {} }) {
       ></div>
 
       {/* Main content with higher z-index */}
-      <div className="relative z-20 flex md:flex-row flex-col justify-center items-center px-8 py-12 gap-6">
+      <div className="relative z-20 flex lg:flex-row flex-col justify-center items-center px-8 py-12 gap-6">
         {/* Glowing title */}
         <div className="relative group">
           <h3 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wide group-hover:scale-105 transition-transform duration-300">
